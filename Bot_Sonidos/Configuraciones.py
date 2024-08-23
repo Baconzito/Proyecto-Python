@@ -1,3 +1,32 @@
+import os
+from pydub import AudioSegment
+import asyncio
+
+"""
+    Configuraciones de Bot Sonidify
+"""
+Dir_Sonidos = "Sonidos"
+Dir_Temp = "Sonidos/temp"
+Dir_FFMPEG = "C:/Users/Javier/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe"
+token = os.getenv("BOT_TOKEN")
+
+sound_queue = asyncio.Queue() #Cola de reproducicon
+is_playing = {} #Sonidos en reproduccion
+
+Max_Tamaño = 15
+MAX_Botones = 25
+
+async def obtener_directorio_sonidos(guild_id):
+    directorio = f"{Dir_Sonidos}/{guild_id}"
+    if not os.path.exists(directorio):
+        os.makedirs(directorio)
+    return directorio
+
+async def cargar_lista_de_audios(directorio):
+    return [archivo for archivo in os.listdir(directorio) if archivo.endswith('.mp3')]
+
+async def ValidarArchivo(Archivo):
+    if(not Archivo.filename.endswith('.mp3')):
         return True
 
     return await ValidarTiempo(Archivo)
