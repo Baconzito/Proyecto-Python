@@ -1,13 +1,16 @@
 import os
 from pydub import AudioSegment
 import asyncio
+import openpyxl
+from openpyxl import Workbook
+from datetime import datetime
 
 """
     Configuraciones de Bot Sonidify
 """
 Dir_Sonidos = "Sonidos"
 Dir_Temp = "Sonidos/temp"
-Dir_FFMPEG = "C:/Users/Javier/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg.Essentials_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe"
+Dir_FFMPEG = "/usr/bin/ffmpeg"
 token = os.getenv("BOT_TOKEN")
 
 sound_queue = asyncio.Queue() #Cola de reproducicon
@@ -52,3 +55,24 @@ async def agregar_a_cola(interaction, audio_file):
         'channel_id': interaction.user.voice.channel.id,
         'path': audio_file
     })
+    
+
+# Función para guardar la información en un archivo Excel
+async def guardar_en_excel(nombre_sonido, guild_id):
+    archivo_excel = "historial_bot.xlsx"
+
+    # Verificar si el archivo ya existe
+    if os.path.exists(archivo_excel):
+        workbook = openpyxl.load_workbook(archivo_excel)
+        hoja = workbook.active
+    else:
+        workbook = Workbook()
+        hoja = workbook.active
+        hoja.append(["Nombre del Sonido", "Fecha", "ID de Servidor"])
+
+    # Agregar los datos
+    fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hoja.append([nombre_sonido, fecha_actual, guild_id])
+
+    # Guardar el archivo
+    workbook.save(archivo_excel)
